@@ -72,7 +72,7 @@ func (proxy *Proxy) ServeHTTP(writer http.ResponseWriter, request *http.Request)
 		proxy.serveSetCookie(writer, translatedRequest, proxy.cookieDomain)
 	default:
 		writer.WriteHeader(http.StatusNotFound)
-		fmt.Fprintf(writer, "Resource Not Found. %s", request.URL.Path)
+		fmt.Fprintf(writer, "Resource Not Found.")
 	}
 }
 
@@ -123,7 +123,7 @@ func (proxy *Proxy) serveAppLogs(paths []string, writer http.ResponseWriter, req
 
 	if badRequest {
 		writer.WriteHeader(http.StatusNotFound)
-		fmt.Fprintf(writer, "Resource Not Found. %s", request.URL.Path)
+		fmt.Fprintf(writer, "Resource Not Found.")
 		return
 	}
 

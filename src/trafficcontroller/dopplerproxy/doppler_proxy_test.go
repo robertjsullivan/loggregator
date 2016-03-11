@@ -3,8 +3,6 @@ package dopplerproxy_test
 import (
 	"trafficcontroller/dopplerproxy"
 
-	"github.com/cloudfoundry/loggregatorlib/loggertesthelper"
-	"github.com/cloudfoundry/loggregatorlib/server/handlers"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -12,6 +10,9 @@ import (
 	"sync"
 	"time"
 	"trafficcontroller/doppler_endpoint"
+
+	"github.com/cloudfoundry/loggregatorlib/loggertesthelper"
+	"github.com/cloudfoundry/loggregatorlib/server/handlers"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -60,7 +61,7 @@ var _ = Describe("ServeHTTP", func() {
 				proxy.ServeHTTP(recorder, req)
 
 				Expect(recorder.Code).To(Equal(http.StatusNotFound))
-				Expect(recorder.Body.String()).To(Equal("Resource Not Found. /apps/abc123/bar"))
+				Expect(recorder.Body.String()).To(Equal("Resource Not Found."))
 			})
 
 			It("It does not attempt to connect to doppler", func() {
@@ -321,7 +322,7 @@ var _ = Describe("ServeHTTP", func() {
 			req, _ := http.NewRequest("GET", "/", nil)
 			proxy.ServeHTTP(recorder, req)
 			Expect(recorder.Code).To(Equal(http.StatusNotFound))
-			Expect(recorder.Body.String()).To(Equal("Resource Not Found. /"))
+			Expect(recorder.Body.String()).To(Equal("Resource Not Found."))
 		})
 	})
 
@@ -329,7 +330,7 @@ var _ = Describe("ServeHTTP", func() {
 		req, _ := http.NewRequest("GET", "/notApps", nil)
 		proxy.ServeHTTP(recorder, req)
 		Expect(recorder.Code).To(Equal(http.StatusNotFound))
-		Expect(recorder.Body.String()).To(Equal("Resource Not Found. /notApps"))
+		Expect(recorder.Body.String()).To(Equal("Resource Not Found."))
 	})
 
 	Context("SetCookie", func() {
