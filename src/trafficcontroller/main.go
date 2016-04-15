@@ -1,8 +1,10 @@
 package main
 
 import (
+	"crypto/tls"
 	"doppler/dopplerservice"
 	"flag"
+	"fmt"
 	"logger"
 	"net"
 	"net/http"
@@ -60,8 +62,11 @@ func main() {
 
 	config, err := config.ParseConfig(*logLevel, *configFile, *logFilePath)
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("Unable to parse config: %s", err))
 	}
+
+	transport := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: config.SkipCertVerify}}
+	http.DefaultClient.Transport = transport
 
 	log := logger.NewLogger(*logLevel, *logFilePath, "loggregator trafficcontroller", config.Syslog)
 	log.Info("Startup: Setting up the loggregator traffic controller")
@@ -88,9 +93,9 @@ func main() {
 		panic(err)
 	}
 
-	logAuthorizer := authorization.NewLogAccessAuthorizer(*disableAccessControl, config.ApiHost, config.SkipCertVerify)
+	logAuthorizer := authorization.NewLogAccessAuthorizer(*disableAccessControl, config.ApiHost)
 
-	uaaClient := uaa_client.NewUaaClient(config.UaaHost, config.UaaClientId, config.UaaClientSecret, config.SkipCertVerify)
+	uaaClient := uaa_client.NewUaaClient(config.UaaHost, config.UaaClientId, config.UaaClientSecret)
 	adminAuthorizer := authorization.NewAdminAccessAuthorizer(*disableAccessControl, &uaaClient)
 
 	preferredServers := func(string) bool { return false }
