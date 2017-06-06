@@ -4,7 +4,10 @@ import (
 	"flag"
 	"log"
 	"metricemitter"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 
 	"google.golang.org/grpc"
@@ -79,6 +82,10 @@ func main() {
 		app.WithHealthAddr(*healthAddr),
 	)
 	go rlp.Start()
+	go profiler.New(uint32(*pprofPort)).Start()
+	defer rlp.Stop()
 
-	profiler.New(uint32(*pprofPort)).Start()
+	killSignal := make(chan os.Signal, 1)
+	signal.Notify(killSignal, syscall.SIGINT, syscall.SIGTERM)
+	<-killSignal
 }
